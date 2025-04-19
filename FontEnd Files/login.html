@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <link rel="icon" href="data:,">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+</head>
+
+<body>
+    <header>
+        <h2>Login Page</h2>
+    </header>
+
+    <div>
+        <form onsubmit="submitData(event);">
+            <label>Enter Email :</label>
+            <input type="text" name="email" id="inputEmail" required>
+            <label>Enter Password :</label>
+            <input type="password" name="password" id="inputPassword" required>
+            <button type="submit">Login</button>
+            <button type="button" onclick="redirectToForgotPasswordPage()">Forgot Password</button>
+            <a href="./signup.html" class="signUp">New User?SignUP</a>
+        </form>
+    </div>
+    <div id="message">
+
+    </div>
+
+
+    <script src="login.js"></script>
+</body>
+
+</html>
