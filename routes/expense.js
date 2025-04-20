@@ -10,8 +10,6 @@ router.post('/add-expense', userAuthorization.authenticate, expenseController.po
 
 router.get('/get-expense', userAuthorization.authenticate, expenseController.getExpense);
 
-router.get('/getAllExpense', userAuthorization.authenticate, expenseController.getAllExpense);
-
 router.delete('/delete-expense/:id', userAuthorization.authenticate, expenseController.deleteExpense);
 
 router.get('/download', userAuthorization.authenticate, expenseController.downloadExpense);

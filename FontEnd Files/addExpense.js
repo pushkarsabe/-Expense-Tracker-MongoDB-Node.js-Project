@@ -109,7 +109,7 @@ async function showLeaderBoards(val) {
 
 //function to display the downloaded files by the user
 function printAllDownloads(data) {
-    console.log('printAllDownloads id = ', data._id);
+    // console.log('printAllDownloads id = ', data._id);
     // console.log('file url = ', data.URL);
 
     const downloadTable = document.getElementById('downloadTable');
@@ -201,7 +201,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         //if the user is preminum then display the chart data
         try {
-            const response = await axios.get('http://localhost:3000/expense/getAllExpense',
+            const response = await axios.get('http://localhost:3000/expense/get-expense',
                 {
                     headers:
                         { "Authorization": token }
@@ -294,28 +294,6 @@ function displayChart(data) {
     const existingPieChart = Chart.getChart(pieCanvas);
     if (existingPieChart) existingPieChart.destroy();
 
-    //bar chart
-    const barCtx = document.getElementById('barChart').getContext('2d');
-    new Chart(barCtx, {
-        type: 'bar',
-        data: {
-            labels,
-            datasets: [{
-                label: 'Total Expense',
-                data: values,
-                backgroundColor: '#4287f5'
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                title: {
-                    display: true,
-                    text: 'Expenses by Category - Bar Chart'
-                }
-            }
-        }
-    });
 
     //pie chart
     const pieCtx = document.getElementById('pieChart').getContext('2d');
@@ -501,6 +479,7 @@ async function submitData(event) {
         const res = await axios.get('http://localhost:3000/expense/getAllExpense', {
             headers: { "Authorization": token }
         });
+        console.log('res:' + res);
 
         displayChart(res.data.expenses);
     }

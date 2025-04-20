@@ -28,14 +28,16 @@ exports.getUserDeatils = async (req, res, next) => {
     ]
 
     try {
-       
+
         const userEmail = req.body.email;
         console.log('getUserDeatils userEmail = ' + userEmail);
-
+        if (!userEmail) {
+            return res.status(400).json({ message: `Email is not present` });
+        }
         const userData = await User.findOne({ email: userEmail });
 
         if (!userData) {
-            return res.status(400).json({ message: `No user with email = ${userEmail}` })
+            return res.status(401).json({ message: `No user with email = ${userEmail}` })
         }
         console.log('getUserDeatils userData = ' + JSON.stringify(userData));
         console.log('getUserDeatils password = ' + userData.password);
@@ -60,7 +62,6 @@ exports.getUserDeatils = async (req, res, next) => {
         })
             .then(response => console.log("Email Sent: ", response))
             .catch(error => console.error("Sendinblue Error: ", error))
-
 
         res.status(200).json({ userData: userData, message: `Link to reset password sent to your mail` });
     } catch (err) {

@@ -31,8 +31,8 @@
 .message.info {
     background-color: #d0f0ff;
     color: #003b5c;
-  }
-  
+}
+
 
 
 @keyframes fadeInOut {
@@ -411,4 +411,52 @@ canvas {
     width: 100% !important;
     max-width: 800px;
     height: auto !important;
+}
+
+
+
+
+/* Footer styles */
+.footer {
+    background: linear-gradient(135deg, #4e54c8, #8f94fb);
+    color: white;
+    text-align: center;
+    padding: 20px 10px;
+    font-size: 1rem;
+    margin-top: 40px;
+    animation: fadeInUp 1.2s ease-in;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.footer-content p {
+    margin: 6px 0;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.footer-content p:hover {
+    transform: scale(1.05);
+    color: #ffe;
+}
+
+/* Fade-in animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+    .footer {
+        font-size: 0.9rem;
+        padding: 15px 5px;
+    }
 }

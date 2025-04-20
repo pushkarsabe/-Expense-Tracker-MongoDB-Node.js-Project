@@ -192,19 +192,3 @@ exports.getExpense = async (req, res, next) => {
     }
 }
 
-
-exports.getAllExpense = async (req, res, next) => {
-    try {
-        console.log('getAllExpense called');
-
-        const allExpenseData = await Expense.find({ userid: req.user._id });
-        console.log('getAllExpense allExpenseData = ', allExpenseData);
-
-        res.status(200).json({
-            expenses: allExpenseData
-        });
-    } catch (err) {
-        console.log('getAllExpense err = ', err);
-        return res.status(400).json({ error: err })
-    }
-}

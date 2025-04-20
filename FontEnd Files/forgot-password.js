@@ -1,6 +1,7 @@
-function redirectToForgotPasswordPage() {
-    windows.location.href = 'forgot-password.html';
+function redirectToLoginPage() {
+    window.location.href = '/login.html';
 }
+
 //function to display the message
 function showMessage(msgText, className) {
     return new Promise(resolve => {
@@ -58,7 +59,31 @@ async function submitData(event) {
     }
     catch (error) {
         console.log('Error object:', error);
-        // await showMessage(error.response.data.message, 'failureMessage');
+
+        if (error.response) {
+            // The request was made and the server responded with a status code outside 2xx
+            const status = error.response.status;
+            const serverMsg = error.response.data?.message || 'Something went wrong!';
+
+            console.log(`Error ${status}: ${serverMsg}`);
+
+            if (status === 400 || status === 401) {
+                await showMessage(serverMsg, 'failureMessage');
+            } else if (status === 500) {
+                await showMessage('Server error. Please try again later.', 'failureMessage');
+            } else {
+                await showMessage(`Unexpected error: ${serverMsg}`, 'failureMessage');
+            }
+        } else if (error.request) {
+            // The request was made but no response was received
+            console.log('No response received:', error.request);
+            await showMessage('No response from server. Please check your connection.', 'failureMessage');
+        } else {
+            // Something else happened
+            console.log('Error setting up the request:', error.message);
+            await showMessage('Unexpected error occurred. Please try again.', 'failureMessage');
+        }
+
     }
 
 }//submitData
