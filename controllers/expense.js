@@ -37,7 +37,7 @@ exports.downloadExpense = async (req, res, next) => {
     }
     catch (err) {
         console.error('downloadExpense error:', err);
-        res.status(500).json({ error: 'Something went wrong' }); ``
+        return res.status(500).json({ error: 'Something went wrong' }); ``
     }
 }//downloadExpense
 
@@ -48,11 +48,11 @@ exports.getDownloadedFiles = async (req, res, next) => {
 
         console.log('getDownloadedFiles files', files);
 
-        res.status(200).json({ downloadFiles: files, message: 'Files received' });
+        return res.status(200).json({ downloadFiles: files, message: 'Files received' });
     }
     catch (err) {
         console.log(err);
-        res.status(400).json({ error: err })
+        return res.status(400).json({ error: err })
     }
 }//getDownloadedFiles
 
@@ -62,14 +62,40 @@ exports.postAddExpense = async (req, res, next) => {
     //post always uses body
     try {
         const { money, description, options } = req.body;
-        console.log('money = ' + money);
-        console.log('description = ' + description);
-        console.log('options = ' + options);
-        console.log('userid = ' + req.user._id);
+        console.log('money = ', money);
+        console.log('description = ', description);
+        console.log('options = ', options);
+        console.log('userid = ', req.user._id);
 
         if (!money || !description || !options) {
             return res.status(400).json({ message: 'Input fields are empty' });
         }
+
+        // Get the latest user data before updating
+        const user = await User.findById(req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const now = new Date();
+        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+        console.log('startOfMonth = ', startOfMonth);
+
+        const thisMonthTotal = await Expense.aggregate([
+            { $match: { userId: req.user._id, createdAt: { $gte: startOfMonth } } },
+            { $group: { _id: null, total: { $sum: "$money" } } }
+
+        ])
+        console.log('thisMonthTotal = ', thisMonthTotal);
+
+        const total = thisMonthTotal[0]?.total || 0;
+
+        // Budget exceeded
+        if (user.monthlyBudget && total > user.monthlyBudget) {
+            console.log("Budget exceeded!");
+            return res.status(401).json({ message: 'Monthly Budget exceeded!' });
+        }
+
 
         const expenseData = await Expense({
             money,
@@ -79,15 +105,9 @@ exports.postAddExpense = async (req, res, next) => {
         });
         await expenseData.save();
 
-        // Get the latest user data before updating
-        const user = await User.findById(req.user._id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
         // Calculate new total
         const totalExpense = Number(user.totalExpenses) + Number(money);
-        console.log('totalExpense = ' + totalExpense);
+        console.log('totalExpense = ', totalExpense);
 
         // Update user with new total and make sure to await the result
         const updatedUser = await User.findByIdAndUpdate(
@@ -98,10 +118,12 @@ exports.postAddExpense = async (req, res, next) => {
 
         console.log('Updated user totalExpenses: ', updatedUser.totalExpenses);
 
-        res.status(200).json({ newExpenseData: expenseData, message: 'Data added successfully', updatedTotalExpenses: updatedUser.totalExpenses })
+        return res.status(200).json({ newExpenseData: expenseData, message: 'Data added successfully', updatedTotalExpenses: updatedUser.totalExpenses })
+
+
     }
     catch (err) {
-        console.log('post expense err = ' + err);
+        console.log('post expense err = ', err);
         return res.status(500).json({ error: err })
     }
 }
@@ -109,7 +131,7 @@ exports.postAddExpense = async (req, res, next) => {
 exports.deleteExpense = async (req, res, next) => {
     try {
         const expenseID = req.params.id;
-        console.log('deleteExpense expenseID = ' + expenseID);
+        console.log('deleteExpense expenseID = ', expenseID);
 
         if (!expenseID) {
             return res.status(400).json({ message: 'Id is empty' });
@@ -202,10 +224,10 @@ exports.updateMonthlyBudget = async (req, res, next) => {
         req.user.monthlyBudget = monthlyBudget;
         await req.user.save();
 
-        res.json({ message: "Monthly budget updated", monthlyBudget });
+        return res.json({ message: "Monthly budget updated", monthlyBudget });
     }
     catch (err) {
         console.log("updateMonthlyBudget err ", err);
-        res.status(400).json({ error: err })
+        return res.status(400).json({ error: err })
     }
-}//getDownloadedFiles
+}//updateMonthlyBudget

@@ -18,26 +18,39 @@
 
     <div class="message-container" id="messageContainer"></div>
 
-    <div id="premiumUserText"></div>
+    <div id="premiumUserDiv">
+        <div id="premiumUserText"></div>
+    </div>
 
-    <div class="formExpense">
-        <form onsubmit="submitData(event);">
-            <label for="money">Enter Money :</label>
-            <input type="number" name="money" id="inputMoney" required>
-            <label for="description">Enter Description :</label>
-            <input type="text" name="description" id="inputDescription" required>
-            <select id="options">
-                <option value="food">Food</option>
-                <option value="petrol">Petrol</option>
-                <option value="salary">Salary</option>
-                <option value="bill">Bill</option>
-                <option value="electricity">Electricity</option>
-                <option value="maintenance">Maintenance</option>
-                <option value="insurance">Insurance</option>
-                <option value="rent">Rent</option>
-            </select>
-            <button type="submit">Add Expense</button>
-        </form>
+
+    <div class="container">
+        <!-- Expense Form -->
+        <div class="formExpense">
+            <form onsubmit="submitData(event);">
+                <label for="money">Enter Money :</label>
+                <input type="number" name="money" id="inputMoney" required>
+                <label for="description">Enter Description :</label>
+                <input type="text" name="description" id="inputDescription" required>
+                <select id="options">
+                    <option value="food">Food</option>
+                    <option value="petrol">Petrol</option>
+                    <option value="salary">Salary</option>
+                    <option value="bill">Bill</option>
+                    <option value="electricity">Electricity</option>
+                    <option value="maintenance">Maintenance</option>
+                    <option value="insurance">Insurance</option>
+                    <option value="rent">Rent</option>
+                </select>
+                <button type="submit">Add Expense</button>
+            </form>
+        </div>
+
+        <!-- Monthly Budget Form -->
+        <div class="budget-container">
+            <h2>Set Your Monthly Budget</h2>
+            <input type="number" id="monthly-budget" placeholder="Enter Monthly Budget" />
+            <button onclick="updateBudget()">Save Budget</button>
+        </div>
     </div>
 
 
@@ -57,12 +70,15 @@
     </div>
     <hr>
 
+
+
     <div id="premiumUserLBDivBtn"></div>
     <div>
         <h2 id="leaderBoard-header" style="margin-left: 25px;margin-bottom:10px;"></h2>
         <ol id="LeaderBoardsList"></ol>
     </div>
     <hr>
+
 
 
     <div id="downloadExpenseBtnDiv">
@@ -83,6 +99,7 @@
     </div>
     <hr>
 
+
     <div id="displayChart">
         <h2 id="expenseChartTitle" style="margin-left: 25px;margin-bottom: 10px;">Expense Chart</h2>
         <div class="chart-container">
@@ -90,6 +107,8 @@
             <canvas id="pieChart"></canvas>
         </div>
     </div>
+
+
 
     <footer class="footer">
         <div class="footer-content">

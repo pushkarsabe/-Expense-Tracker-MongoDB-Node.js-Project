@@ -125,8 +125,8 @@ function printAllDownloads(data) {
 //to print the expense data in list
 function printAllExpenses(data) {
     console.log('inside printAllExpenses');
-    console.log('data = ' + data.id);
-    console.log('money = ' + data.money);
+    // console.log('data = ' + data.id);
+    // console.log('money = ' + data.money);
     // console.log('description = ' + data.description);
     // console.log('options = ' + data.options);
     const olExpenses = document.getElementById('olExpenses');
@@ -208,6 +208,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 })
             console.log('response ', response.data.expenses);
             displayChart(response.data.expenses);
+
+            //also display updateBudget container
+
 
         }
         catch (error) {
@@ -430,7 +433,7 @@ async function downloadEpense() {
         if (error.response.status === 401) {
             console.log("error message = " + error.response.data.message);
             displayMessage('Not A premium user', 'error');
-        } 
+        }
         else {
             console.log("error message = " + error);
             displayMessage('error', 'error');
@@ -474,12 +477,12 @@ async function submitData(event) {
         document.getElementById('inputDescription').value = "";
         document.getElementById('options').value = "";
 
-        displayMessage('Expense completed successfully!', 'success');
+        displayMessage('Expense added successfully!', 'success');
 
         printAllExpenses(response.data.newExpenseData);
 
         // Re-fetch updated data and update the chart
-        const res = await axios.get('http://localhost:3000/expense/getAllExpense', {
+        const res = await axios.get('http://localhost:3000/expense/getExpense', {
             headers: { "Authorization": token }
         });
         console.log('res:' + res);
@@ -492,7 +495,16 @@ async function submitData(event) {
             console.log('Error object:', error.response.data.message);
             displayMessage('Input fields are empty', 'error');
         }
-        console.log('Unhandled error:', error);
+        else if (error.response.status == 401) {
+            console.log('Error object:', error.response.data.message);
+            displayMessage('Monthly Budget exceeded!', 'error');
+        }
+        else if (error.response.status == 404) {
+            console.log('Error object:', error.response.data.message);
+            displayMessage('User not found', 'error');
+        }
+        else
+            console.log('Unhandled error:', error);
     }
 
 }//submitData
@@ -510,7 +522,7 @@ async function deleteExpense(id) {
             displayMessage('Data deleted successfully', 'success');
 
             // Re-fetch updated data and update the chart
-            const res = await axios.get('http://localhost:3000/expense/getAllExpense', {
+            const res = await axios.get('http://localhost:3000/expense/getExpense', {
                 headers: { "Authorization": token }
             });
 
@@ -537,3 +549,44 @@ async function deleteExpense(id) {
     }
 }//deleteExpense
 
+async function updateBudget() {
+    console.log('inside updateBudget expense');
+    const token = localStorage.getItem('token');
+    console.log('token:', token);
+
+    if (!token) {
+        displayMessage('Authentication failed. Please log in again.', 'error');
+        setTimeout(() => {
+            window.location.href = '/login.html';
+        }, 3000)
+        return;
+    }
+
+    try {
+        const budget = document.getElementById('monthly-budget').value;
+
+        if (!budget) {
+            displayMessage('Oops! Looks like you forgot to enter your monthly budget.', 'error');
+            return;
+        }
+
+        const response = await axios.put(`http://localhost:3000/expense/updateMonthlyBudget`,
+            { monthlyBudget: Number(budget) },
+            {
+                headers: { "Authorization": token }
+            });
+        console.log('response:', response);
+
+        displayMessage('Monthly budget set successfully!', 'success');
+        document.getElementById('monthly-budget').value = "";
+    }
+    catch (error) {
+        //to handle the output response errors
+        if (error.response.status == 400) {
+            displayMessage('Budget must be positive', 'error');
+        }
+        else
+            console.log('Unhandled error:', error);
+    }
+
+}//updateBudget

@@ -120,18 +120,43 @@ header h2 {
     transform: translateY(1px);
 }
 
+/* Premium User Container */
+#premiumUserDiv {
+    background: linear-gradient(135deg, #e0f3ff, #f1f8ff);
+    border: 2px solid #a3c9ff;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin: 30px auto;
+    max-width: 700px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    animation: fadeInHighlight 0.8s ease-in-out;
+}
+
 /* Premium User Text */
 #premiumUserText {
     background-color: rgba(37, 117, 252, 0.1);
     color: #2575fc;
     padding: 15px;
     border-radius: 8px;
-    margin: 20px auto;
-    max-width: 600px;
     text-align: center;
     font-weight: bold;
     font-size: 1.1rem;
 }
+
+/* Animation to highlight when added */
+@keyframes fadeInHighlight {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
 
 /* Premium User Leaderboard Button */
 #premiumUserLBDivBtn {
@@ -157,16 +182,42 @@ header h2 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Form Expense */
-.formExpense {
-    background-color: white;
-    max-width: 600px;
-    margin: 30px auto;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+/* Section Styles */
+h2 {
+    color: #333;
+    margin: 25px;
+    font-size: 1.8rem;
 }
 
+
+/* Main container setup */
+.container {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    /* Makes both forms equal height */
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 20px;
+    /* Space between the two forms */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+/* Common style for both form containers */
+.formExpense,
+.budget-container {
+    width: 50%;
+    margin: 10px;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+}
+
+/* Expense form styling */
 .formExpense form {
     display: flex;
     flex-direction: column;
@@ -215,13 +266,59 @@ header h2 {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-
-/* Section Styles */
-h2 {
+/* Budget form specific styling */
+.budget-container h2 {
+    margin-bottom: 20px;
     color: #333;
-    margin: 25px;
-    font-size: 1.8rem;
 }
+
+#monthly-budget {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+}
+
+#monthly-budget:focus {
+    border-color: #6c63ff;
+    outline: none;
+}
+
+.budget-container button {
+    background-color: #6c63ff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.budget-container button:hover {
+    background-color: #574fd6;
+    transform: scale(1.05);
+}
+
+/* Responsive for smaller screens */
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+    }
+
+    .formExpense,
+    .budget-container {
+        width: 100%;
+        margin: 10px 0;
+    }
+}
+
+
+
+
 
 /* Expenses List */
 #addedExpenses {
@@ -297,6 +394,9 @@ h2 {
     border: 1px solid #ddd;
     margin-left: 10px;
 }
+
+
+
 
 /* Leaderboard */
 #leaderBoard-header {
@@ -386,9 +486,6 @@ hr {
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .formExpense {
-        margin: 20px;
-    }
 
     header h2 {
         font-size: 1.8rem;
