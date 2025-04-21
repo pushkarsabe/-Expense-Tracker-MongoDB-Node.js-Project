@@ -13,7 +13,7 @@ exports.postAddUser = async (req, res, next) => {
         //post always uses body
         const { name, email, password } = req.body;
         console.log('name = ', name);
-        console.log('email = ' + email);
+        console.log('email = ', email);
         console.log('password = ', password);
 
         if (!name || !email || !password) {
@@ -98,3 +98,29 @@ exports.postLoginUser = async (req, res, next) => {
 function generateAccessToken(id, name, ispremiumuser) {
     return jwt.sign({ userid: id, name: name, ispremiumuser }, 'secretkey');
 }
+
+
+exports.getUserData = async (req, res, next) => {
+    try {
+        //post always uses body
+        const userid = req.user._id;
+        console.log('getUserData userid = ', userid);
+
+        const user = await User.findOne({ _id: userid });
+        console.log('user = ', user);
+
+        if (!user) {
+            return res.status(401).json({ message: 'Email does not exists' });
+        }
+
+        return res.status(200).json({
+            user: user,
+            message: 'Data fetched Successful',
+        });
+
+    } catch (err) {
+        console.error('Error during get User Data:', err);
+        return res.status(500).json({ message: 'Something went wrong' });
+    }
+
+}//getUserData

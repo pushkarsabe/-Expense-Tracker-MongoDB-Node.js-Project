@@ -199,6 +199,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         showLBtn.style.marginLeft = '20px';
         premiumUserDIV.appendChild(showLBtn);
 
+        document.getElementById('budgetContainer').style.display = 'block';
+
         //if the user is preminum then display the chart data
         try {
             const response = await axios.get('http://localhost:3000/expense/get-expense',
@@ -206,11 +208,32 @@ document.addEventListener('DOMContentLoaded', async () => {
                     headers:
                         { "Authorization": token }
                 })
-            console.log('response ', response.data.expenses);
+            console.log('response ---', response.data.expenses);
             displayChart(response.data.expenses);
 
-            //also display updateBudget container
+            const response1 = await axios.get('http://localhost:3000/user/userData',
+                {
+                    headers:
+                        { "Authorization": token }
+                })
+            console.log('response1 ', response1.data.user);
+            let totalExpenses = response1.data.user.totalExpenses;
+            let monthlyBudget = response1.data.user.monthlyBudget;
+            console.log('totalExpenses = ', totalExpenses);
+            console.log('monthlyBudget = ', monthlyBudget);
 
+            const percent = monthlyBudget ? Math.min(100, (totalExpenses / monthlyBudget) * 100) : 0;
+
+            const bar = document.getElementById('budgetBar');
+            bar.style.width = percent + '%';
+            bar.innerText = `₹${totalExpenses} / ₹${monthlyBudget}`;
+            if (percent >= 90) {
+                bar.style.background = '#f44336'; // red
+            } else if (percent >= 60) {
+                bar.style.background = '#ff9800'; // orange
+            } else {
+                bar.style.background = '#4caf50'; // green
+            }
 
         }
         catch (error) {
