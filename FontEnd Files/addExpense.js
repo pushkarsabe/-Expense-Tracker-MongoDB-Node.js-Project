@@ -125,8 +125,8 @@ function printAllDownloads(data) {
 //to print the expense data in list
 function printAllExpenses(data) {
     console.log('inside printAllExpenses');
-    // console.log('data = ' + data.id);
-    // console.log('money = ' + data.money);
+    console.log('data = ' + data.id);
+    console.log('money = ' + data.money);
     // console.log('description = ' + data.description);
     // console.log('options = ' + data.options);
     const olExpenses = document.getElementById('olExpenses');
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     { "Authorization": token }
             })
         console.log('inside getFiles');
-        // console.log('res = ', res);
+        console.log('res = ', res);
 
         displayMessage(res.data.message || 'Files received', 'success');
 
@@ -256,6 +256,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     catch (error) {
         console.log('Unhandled error:', error);
+
     }
 
 })//DOMContentLoaded
@@ -429,9 +430,11 @@ async function downloadEpense() {
         if (error.response.status === 401) {
             console.log("error message = " + error.response.data.message);
             displayMessage('Not A premium user', 'error');
+        } 
+        else {
+            console.log("error message = " + error);
+            displayMessage('error', 'error');
         }
-        console.log("error message = " + error);
-        displayMessage('error', 'error');
     }
 }//downloadEpense
 

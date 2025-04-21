@@ -46,11 +46,7 @@ exports.getDownloadedFiles = async (req, res, next) => {
     try {
         const files = await DownloadExpense.find({ userId: req.user._id });
 
-        if (!files.length) {
-            return res.status(404).json({ message: 'No download files found for this user.' });
-        }
-
-        // console.log('getDownloadedFiles files', files);
+        console.log('getDownloadedFiles files', files);
 
         res.status(200).json({ downloadFiles: files, message: 'Files received' });
     }
@@ -192,3 +188,24 @@ exports.getExpense = async (req, res, next) => {
     }
 }
 
+exports.updateMonthlyBudget = async (req, res, next) => {
+    try {
+        console.log('updateMonthlyBudget req.user._id:', req.user._id);
+
+        const { monthlyBudget } = req.body;
+        console.log('monthlyBudget', monthlyBudget);
+
+        if (monthlyBudget < 0) {
+            return res.status(400).json({ error: 'Budget must be positive' });
+        }
+
+        req.user.monthlyBudget = monthlyBudget;
+        await req.user.save();
+
+        res.json({ message: "Monthly budget updated", monthlyBudget });
+    }
+    catch (err) {
+        console.log("updateMonthlyBudget err ", err);
+        res.status(400).json({ error: err })
+    }
+}//getDownloadedFiles

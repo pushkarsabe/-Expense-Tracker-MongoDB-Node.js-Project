@@ -16,4 +16,6 @@ router.get('/download', userAuthorization.authenticate, expenseController.downlo
 
 router.get('/getFiles', userAuthorization.authenticate, expenseController.getDownloadedFiles);
 
+router.put('/updateMonthlyBudget', userAuthorization.authenticate, expenseController.updateMonthlyBudget);
+
 module.exports = router;
