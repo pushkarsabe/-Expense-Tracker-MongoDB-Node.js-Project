@@ -211,29 +211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             console.log('response ---', response.data.expenses);
             displayChart(response.data.expenses);
 
-            const response1 = await axios.get('http://localhost:3000/user/userData',
-                {
-                    headers:
-                        { "Authorization": token }
-                })
-            console.log('response1 ', response1.data.user);
-            let totalExpenses = response1.data.user.totalExpenses;
-            let monthlyBudget = response1.data.user.monthlyBudget;
-            console.log('totalExpenses = ', totalExpenses);
-            console.log('monthlyBudget = ', monthlyBudget);
-
-            const percent = monthlyBudget ? Math.min(100, (totalExpenses / monthlyBudget) * 100) : 0;
-
-            const bar = document.getElementById('budgetBar');
-            bar.style.width = percent + '%';
-            bar.innerText = `₹${totalExpenses} / ₹${monthlyBudget}`;
-            if (percent >= 90) {
-                bar.style.background = '#f44336'; // red
-            } else if (percent >= 60) {
-                bar.style.background = '#ff9800'; // orange
-            } else {
-                bar.style.background = '#4caf50'; // green
-            }
+            await refreshBudgetBar();
 
         }
         catch (error) {
@@ -566,11 +544,11 @@ async function deleteExpense(id) {
             }
         }
     }
-
     else {
         displayMessage('User Do Not Want to Delete Expense', 'info');
     }
 }//deleteExpense
+
 
 async function updateBudget() {
     console.log('inside updateBudget expense');
@@ -602,14 +580,54 @@ async function updateBudget() {
 
         displayMessage('Monthly budget set successfully!', 'success');
         document.getElementById('monthly-budget').value = "";
+
+        await refreshBudgetBar();
     }
     catch (error) {
-        //to handle the output response errors
-        if (error.response.status == 400) {
+        if (error.response && error.response.status === 400) {
             displayMessage('Budget must be positive', 'error');
-        }
-        else
+        } else {
             console.log('Unhandled error:', error);
+        }
     }
 
 }//updateBudget
+
+async function refreshBudgetBar() {
+    console.log('inside refreshBudgetBar');
+
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        displayMessage('Authentication failed. Please log in again.', 'error');
+        return;
+    }
+
+    try {
+        const response1 = await axios.get('http://localhost:3000/user/userData', {
+            headers: { "Authorization": token }
+        });
+
+        let totalExpenses = response1.data.user.totalExpenses;
+        let monthlyBudget = response1.data.user.monthlyBudget;
+
+        console.log('totalExpenses = ', totalExpenses);
+        console.log('monthlyBudget = ', monthlyBudget);
+
+        const percent = monthlyBudget ? Math.min(100, (totalExpenses / monthlyBudget) * 100) : 0;
+
+        const bar = document.getElementById('budgetBar');
+        bar.style.width = percent + '%';
+        bar.innerText = `₹${totalExpenses} / ₹${monthlyBudget}`;
+
+        if (percent >= 90) {
+            bar.style.background = '#f44336'; // red
+        } else if (percent >= 60) {
+            bar.style.background = '#ff9800'; // orange
+        } else {
+            bar.style.background = '#4caf50'; // green
+        }
+    } catch (err) {
+        console.log('Error updating budget bar:', err);
+    }
+}//refreshBudgetBar
