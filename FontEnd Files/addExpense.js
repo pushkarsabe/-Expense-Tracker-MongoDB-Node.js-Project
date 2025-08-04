@@ -136,16 +136,22 @@ function printAllDownloads(data) {
 }//printAllDownloads
 
 //to print the expense data in list
-function printAllExpenses(data) {
+function printAllExpenses(data, index, currentPage,) {
     console.log('inside printAllExpenses');
     // console.log('data = ' + data.id);
-    // console.log('money = ' + data.money);
+    console.log('index = ' + index);
+    console.log('currentPage = ' + currentPage);
+    console.log('selectedRowOption = ' + selectedRowOption);
     // console.log('description = ' + data.description);
     // console.log('options = ' + data.options);
     const olExpenses = document.getElementById('olExpenses');
-
     const li = document.createElement('li');
-    const text = document.createTextNode(`Money : ${data.money}, Description  : ${data.description},, Options  : ${data.options}`);
+    // Calculate serial number:
+    // For page n (1-based), index (0-based), size = selectedRowOption
+    const serialNumber = ((currentPage - 1) * selectedRowOption) + (index + 1);
+    console.log('serialNumber = ' + serialNumber);
+
+    const text = document.createTextNode(`${serialNumber} : Money : ${data.money}, Description  : ${data.description}, Options  : ${data.options}`);
     li.appendChild(text);
     const deleteBTN = document.createElement('button');
     deleteBTN.id = data._id;
@@ -356,10 +362,15 @@ async function fetchExpenseDataPagination(selectedRowOption, currentPage) {
                 "Authorization": token
             }
         });
+
+        // CLEAR the list BEFORE appending new items!
+        const olExpenses = document.getElementById('olExpenses');
+        olExpenses.innerHTML = "";
+
         //to print the expense data
         const expenseData = response.data.expenses;
         for (let i = 0; i < expenseData.length; i++) {
-            printAllExpenses(expenseData[i]);
+            printAllExpenses(expenseData[i], i, currentPage, selectedRowOption);
         }
         handleNavigationButtons(response.data);
     }
@@ -427,7 +438,7 @@ async function getExpenses(page) {
     //to print the expense data
     const expenseData = response.data.expenses;
     for (let i = 0; i < expenseData.length; i++) {
-        printAllExpenses(expenseData[i]);
+        printAllExpenses(expenseData[i], i, page, selectedRowOption);
     }
     handleNavigationButtons(response.data);
 }
@@ -467,9 +478,9 @@ async function submitData(event) {
     const description = document.getElementById('inputDescription').value;
     const options = document.getElementById('options').value;
 
-    console.log('money = ' + money);
-    console.log('description = ' + description);
-    console.log('options = ' + options);
+    console.log('money = ', money);
+    console.log('description = ', description);
+    console.log('options = ', options);
 
     const obj = {
         money: money,
@@ -479,16 +490,17 @@ async function submitData(event) {
 
     try {
         const token = localStorage.getItem('token');
-        console.log('token:' + token);
+        console.log('token:', token);
         const response = await axios.post(`http://localhost:3000/expense/add-expense`, obj, {
             headers: {
                 "Authorization": token
             }
         });
-        console.log('response data = ' + JSON.stringify(response.data));
-        console.log('money = ' + response.data.newExpenseData.money);
-        console.log('description = ' + response.data.newExpenseData.description);
-        console.log('options = ' + response.data.newExpenseData.options);
+        console.log('response data = ', JSON.stringify(response.data));
+        console.log('money = ', response.data.newExpenseData.money);
+        console.log('description = ', response.data.newExpenseData.description);
+        console.log('options = ', response.data.newExpenseData.options);
+        console.log('expenseCount = ', response.data.expenseCount);
 
         document.getElementById('inputMoney').value = "";
         document.getElementById('inputDescription').value = "";
@@ -496,9 +508,11 @@ async function submitData(event) {
 
         displayMessage('Expense added successfully!', 'success');
 
-        // printAllExpenses(response.data.newExpenseData);
-        // console.log('selectedRowOption = ', selectedRowOption, 'currentPage = ', currentPage);
-        // fetchExpenseDataPagination(selectedRowOption, currentPage);
+        const totalPages = Math.ceil(response.data.expenseCount / selectedRowOption);
+        console.log('totalPages = ', totalPages);
+        // Now fetch that page and display it
+        await fetchExpenseDataPagination(selectedRowOption, totalPages);
+
 
 
         // Re-fetch updated data and update the chart

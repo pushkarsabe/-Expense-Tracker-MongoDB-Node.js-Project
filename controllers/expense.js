@@ -96,7 +96,6 @@ exports.postAddExpense = async (req, res, next) => {
             return res.status(401).json({ message: 'Monthly Budget exceeded!' });
         }
 
-
         const expenseData = await Expense({
             money,
             description,
@@ -115,11 +114,12 @@ exports.postAddExpense = async (req, res, next) => {
             { totalExpenses: totalExpense },
             { new: true }  // Return the updated document
         );
-
         console.log('Updated user totalExpenses: ', updatedUser.totalExpenses);
 
-        return res.status(200).json({ newExpenseData: expenseData, message: 'Data added successfully', updatedTotalExpenses: updatedUser.totalExpenses })
+        let expenseCount = await Expense.countDocuments({ userId: req.user._id });
+        console.log('expenseCount = ', expenseCount);
 
+        return res.status(200).json({ newExpenseData: expenseData, expenseCount: expenseCount, message: 'Data added successfully', updatedTotalExpenses: updatedUser.totalExpenses })
 
     }
     catch (err) {
