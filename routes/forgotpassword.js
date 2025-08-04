@@ -4,7 +4,7 @@ const router = express.Router();
 
 const forgotpasswordController = require('../controllers/forgotpassword');
 
-// router.post('/forgotpassword', forgotpasswordController.getUserDeatils);
+router.post('/forgotpassword', forgotpasswordController.getUserDeatils);
 
 router.get('/resetpassword/:id', forgotpasswordController.resetpassword);
 

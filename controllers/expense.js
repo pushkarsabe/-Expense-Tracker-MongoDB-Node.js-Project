@@ -177,9 +177,12 @@ exports.deleteExpense = async (req, res, next) => {
 
 exports.getExpense = async (req, res, next) => {
     try {
+        console.log('inside getExpense');
         //limit per page
-        const page = + req.query.page || 1;
-        const ITEM_PER_PAGE = Number(req.query.numberOfRows);
+        // const page = + req.query.page || 1;
+        // const ITEM_PER_PAGE = Number(req.query.numberOfRows);
+        const page = req.query.page ? parseInt(req.query.page) : null;
+        const ITEM_PER_PAGE = req.query.numberOfRows ? parseInt(req.query.numberOfRows) : null;
 
         console.log('getExpense page = ', page);
         console.log('ITEM_PER_PAGE = ', ITEM_PER_PAGE);
@@ -187,23 +190,37 @@ exports.getExpense = async (req, res, next) => {
         const totalCount = await Expense.countDocuments({ userId: req.user._id });
         console.log('totalCount =', totalCount);
 
-        const allExpenseData = await Expense.find({
-            userId: req.user._id
-        })
-            .skip((page - 1) * ITEM_PER_PAGE)
-            .limit(ITEM_PER_PAGE)
+        if (page && ITEM_PER_PAGE) {
+            // Paginated response
+            const allExpenseData = await Expense.find({
+                userId: req.user._id
+            })
+                .skip((page - 1) * ITEM_PER_PAGE)
+                .limit(ITEM_PER_PAGE)
 
-        console.log('getExpense allExpenseData = ' + JSON.stringify(allExpenseData));
+            console.log('getExpense allExpenseData = ' + JSON.stringify(allExpenseData));
 
-        res.status(200).json({
-            expenses: allExpenseData,
-            currentPage: page,
-            hasNextPage: ITEM_PER_PAGE * page < totalCount,
-            nextPage: page + 1,
-            hasPreviousPage: page > 1,
-            previousPage: page - 1,
-            lastPage: Math.ceil(totalCount / ITEM_PER_PAGE),
-        });
+            return res.status(200).json({
+                expenses: allExpenseData,
+                currentPage: page,
+                hasNextPage: ITEM_PER_PAGE * page < totalCount,
+                nextPage: page + 1,
+                hasPreviousPage: page > 1,
+                previousPage: page - 1,
+                lastPage: Math.ceil(totalCount / ITEM_PER_PAGE),
+            });
+        }
+        else {
+            // Return all expenses if no pagination params
+            allExpenseData = await Expense.find({ userId: req.user._id });
+
+            return res.status(200).json({
+                expenses: allExpenseData,
+                totalCount,
+                message: 'All expenses returned (no pagination)',
+            });
+        }
+
     } catch (err) {
         console.log('getExpense err = ' + err);
         return res.status(400).json({ error: err })

@@ -55,6 +55,19 @@ function parseJWT(token) {
 
     return JSON.parse(jsonPayload);
 }
+function signOut() {
+    console.log('inside signOut');
+    let token = localStorage.getItem('token');
+    if (token) {
+        localStorage.removeItem('token');
+        console.log('Token removed from localStorage');
+        displayMessage('Sign Out Successful', 'success');
+    }
+    setTimeout(() => {
+        window.location.href = '/login.html';
+        console.log('Redirecting to login page');
+    }, 1000)
+}
 
 //function to hide the premium button and display the text
 function showPremiumuser() {
@@ -174,7 +187,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         displayMessage('Authentication failed. Please log in again.', 'error');
         setTimeout(() => {
             window.location.href = '/login.html';
-        }, 3000)
+        }, 1)
         return;
     }
 
@@ -225,6 +238,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     //to pagination
     let currentPage = 1;
     let numberOfRows = document.getElementById('numberOfRows');
+    console.log('currentPage = ', currentPage, 'numberOfRows = ', numberOfRows.value);
 
     //if the user does not select the rows the this function will get called 
     await fetchExpenseDataPagination(selectedRowOption, currentPage);
@@ -233,7 +247,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     numberOfRows.addEventListener('change', async () => {
         console.log('inside DOMContentLoaded addEventListener change');
         selectedRowOption = numberOfRows.value;
-        console.log('selectedRowOption = ' + selectedRowOption);
+        console.log('selectedRowOption = ', selectedRowOption);
         //every time user choose no of rows the list should be empty then new no of rows should be added
         olExpenses.innerHTML = '';
         //if the user select the rows the this function will get called 
@@ -333,6 +347,8 @@ function displayChart(data) {
 //function to get the number of expenses records after user selects number of rows
 async function fetchExpenseDataPagination(selectedRowOption, currentPage) {
     console.log('inside fetchExpenseDataPagination');
+    console.log('selectedRowOption = ', selectedRowOption, 'currentPage = ', currentPage);
+
     const token = localStorage.getItem('token');
     try {
         const response = await axios.get(`http://localhost:3000/expense/get-expense?page=${currentPage}&numberOfRows=${selectedRowOption}`, {
@@ -354,7 +370,7 @@ async function fetchExpenseDataPagination(selectedRowOption, currentPage) {
 
 // Function to handle pagination buttons
 function handleNavigationButtons({ currentPage, hasNextPage, nextPage, hasPreviousPage, previousPage, lastPage }) {
-    console.log('inside andleNavigationButtons');
+    console.log('inside handleNavigationButtons');
     console.log('currentPage = ' + currentPage);
     console.log('hasNextPage = ' + hasNextPage);
     console.log('nextPage = ' + nextPage);
@@ -400,7 +416,7 @@ function handleNavigationButtons({ currentPage, hasNextPage, nextPage, hasPrevio
 //to get the pages and print as pagination
 async function getExpenses(page) {
     console.log('inside getExpenses');
-    console.log('selectedRowOption = ' + selectedRowOption);
+    console.log('selectedRowOption = ', selectedRowOption, 'page = ', page);
     const token = localStorage.getItem('token');
     const response = await axios.get(`http://localhost:3000/expense/get-expense?page=${page}
     &numberOfRows=${selectedRowOption}`, {
@@ -480,14 +496,16 @@ async function submitData(event) {
 
         displayMessage('Expense added successfully!', 'success');
 
-        printAllExpenses(response.data.newExpenseData);
+        // printAllExpenses(response.data.newExpenseData);
+        // console.log('selectedRowOption = ', selectedRowOption, 'currentPage = ', currentPage);
+        // fetchExpenseDataPagination(selectedRowOption, currentPage);
+
 
         // Re-fetch updated data and update the chart
-        const res = await axios.get('http://localhost:3000/expense/getExpense', {
+        const res = await axios.get('http://localhost:3000/expense/get-expense', {
             headers: { "Authorization": token }
         });
         console.log('res:' + res);
-
         displayChart(res.data.expenses);
     }
     catch (error) {
@@ -523,11 +541,11 @@ async function deleteExpense(id) {
             displayMessage('Data deleted successfully', 'success');
 
             // Re-fetch updated data and update the chart
-            const res = await axios.get('http://localhost:3000/expense/getExpense', {
+            const res = await axios.get('http://localhost:3000/expense/get-expense', {
                 headers: { "Authorization": token }
             });
 
-            //to delete data from frotend 
+            //to delete data from frontend 
             const parentele = document.getElementById(id).parentNode;
             olExpenses.removeChild(parentele);
 
